@@ -73,6 +73,36 @@ import { loadHero } from "./utilities/hero.js"
 import { loadFooter } from "./utilities/footer.js"
 import { loadRegistration } from "./utilities/registration.js"
 
+let path = location.pathname;
+
+/* handle geo hash routing */
+if(location.hash){
+  path = location.hash.slice(1);
+}
+
+const parts = path.split("/").filter(Boolean);
+
+/* GEO SEO */
+if(parts[0] === "geo"){
+
+  function format(s){
+    return s.replaceAll("-", " ").replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  const state = format(parts[1] || "");
+  const district = format(parts[2] || "");
+  const mandal = format(parts[3] || "");
+  const village = format(parts[4] || "");
+
+  document.title = `Book Nadaswaram & Dolu in ${village} | Vidhwaan`;
+
+  const desc = `Book Nadaswaram, Dolu, Saxophone and Drum artists in ${village}, ${mandal}, ${district}, ${state}.`;
+
+  let meta = document.querySelector("meta[name='description']");
+  if(meta) meta.setAttribute("content", desc);
+}
+
+/* NORMAL LOAD */
 loadNav()
 loadHero()
 loadRegistration()
