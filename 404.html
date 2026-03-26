@@ -1,46 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Redirecting...</title>
-
 <script>
-(function() {
-
-  const path = location.pathname;
-
-  /* 🚫 STOP LOOP if already redirected */
-  if (path.includes("index.html")) {
-    return;
-  }
-
-  /* ✅ HANDLE GEO ROUTES */
-  if (path.startsWith("/geo/")) {
-
-    // remove "/geo/" from start
-    const cleanPath = path.replace(/^\/geo\//, "").replace(/\/$/, "");
-
-    // redirect using hash (no reload loop)
-    location.replace("/geo/index.html#" + cleanPath);
-    return;
-  }
-
-  /* ✅ DEFAULT → go to homepage */
-  location.replace("/");
-
-})();
+if (location.pathname.startsWith("/geo/")) {
+  location.replace("/#" + location.pathname);
+}
 </script>
-
 </head>
-
-<body>
-
-<p style="text-align:center;margin-top:40px;font-family:sans-serif;">
-Redirecting...
-</p>
-
-</body>
+<body></body>
 </html>
