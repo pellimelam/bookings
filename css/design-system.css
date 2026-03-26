@@ -32,6 +32,42 @@
 
 /* BASE */
 
+
+#registration .field{
+margin-bottom:16px;
+position:relative;
+z-index:1;
+}
+
+#registration input,
+#registration select{
+width:100%;
+padding:14px;
+border-radius:10px;
+border:1px solid #334155;
+background:#1e293b;
+color:white;
+font-size:14px;
+outline:none;
+box-sizing:border-box;
+}
+
+#registration input:focus{
+border:1px solid #2563eb;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 body{
 margin:0;
 background:var(--bg-primary);
