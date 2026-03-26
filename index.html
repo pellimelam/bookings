@@ -86,36 +86,45 @@ if(location.hash){
   path = location.hash.slice(1);
 }
 
-/* 🔥 FINAL ROUTING SYSTEM (NORMALIZE + VALIDATE + PREVENT DUPLICATES) */
 
-/* normalize path */
+
+/* 🔥 FINAL CLEAN ROUTING (NO # ON HOMEPAGE + STRICT GEO ONLY) */
+
+/* handle path */
 let cleanPath = path
-  .replace(/\/+/g, "/")     // remove multiple slashes
-  .replace(/\/$/, "")       // remove trailing slash
+  .replace(/\/+/g, "/")
+  .replace(/\/$/, "")
   .toLowerCase();
 
-/* enforce geo trailing slash */
-if(cleanPath.startsWith("/geo")){
+/* 🚫 DO NOT TOUCH HOMEPAGE */
+if(cleanPath === "" || cleanPath === "/"){
+  // homepage → no redirect, no #
+} 
+else if(cleanPath.startsWith("/geo")){
+
+  /* enforce trailing slash */
   cleanPath = cleanPath + "/";
+
+  if(cleanPath !== path){
+    location.replace("/#" + cleanPath);
+  }
+
+} 
+else {
+  /* ❌ block everything else */
+  location.replace("/");
 }
 
-/* redirect if not clean */
-if(cleanPath !== path){
-  location.replace("/#" + cleanPath);
-}
-
-/* split parts */
+/* split */
 const parts = cleanPath.split("/").filter(Boolean);
 
 /* 🔒 STRICT GEO VALIDATION */
 if(parts[0] === "geo"){
 
-  /* valid depth only */
   if(parts.length < 2 || parts.length > 5){
     location.replace("/");
   }
 
-  /* valid slug check */
   const isValidSlug = (s) => /^[a-z0-9-]+$/.test(s);
 
   for(let i = 1; i < parts.length; i++){
@@ -123,15 +132,7 @@ if(parts[0] === "geo"){
       location.replace("/");
     }
   }
-
-} else {
-  /* ❌ block everything except homepage */
-  if(parts.length > 0){
-    location.replace("/");
-  }
 }
-
-
 
 /* GEO SEO (TOP RANKING VERSION) */
 if(parts[0] === "geo"){
