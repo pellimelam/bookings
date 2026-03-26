@@ -381,7 +381,7 @@ document.getElementById("result").innerText = "Sending...";
 
 try{
 
-await fetch("https://frosty-sun-54f1.needfullfil.workers.dev/",{
+await fetch("https://frosty-sun-54f1.needfullfil.workers.dev",{
 method:"POST",
 headers:{
 "Content-Type":"text/plain"
