@@ -17,7 +17,7 @@ margin-bottom:12px;
 ">
 
 <div style="display:flex;align-items:center;gap:10px;">
-<img src="/${key}1.png" style="width:34px;height:34px;border-radius:6px;">
+<img src="./${key}1.png" style="width:34px;height:34px;border-radius:6px;">
 <span>${label}</span>
 </div>
 
@@ -267,8 +267,11 @@ updateSummary();
 
 function updateSummary(){
 
-const from = document.getElementById("fromDate").value;
-const to = document.getElementById("toDate").value;
+const fromInput = document.getElementById("fromDate");
+const toInput = document.getElementById("toDate");
+
+const from = fromInput.value;
+const to = toInput.value;
 
 let days = 0;
 
@@ -354,12 +357,16 @@ try{
 
 await fetch("https://frosty-sun-54f1.needfullfil.workers.dev/",{
 method:"POST",
+headers:{
+"Content-Type":"text/plain"
+},
 body:text
 });
 
 document.getElementById("result").innerHTML = "✅ Booking Sent Successfully";
 
 }catch(e){
+console.error(e);
 
 document.getElementById("result").innerHTML = "❌ Failed. Try again.";
 
