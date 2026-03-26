@@ -27,7 +27,8 @@
 import { loadRegistration } from "/utilities/registration.js";
 
 /* 🔥 GET URL PARTS */
-const path = location.pathname.split("/").filter(Boolean);
+let raw = location.hash ? location.hash.slice(1) : location.pathname;
+const path = raw.split("/").filter(Boolean);
 
 /*
 Expected:
