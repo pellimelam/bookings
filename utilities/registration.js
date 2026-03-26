@@ -78,11 +78,11 @@ ${vidwaanRow("drum","Drum")}
 <!-- DATE -->
 <!-- DATE -->
 <div class="field">
-<input type="date" id="fromDate" oninput="updateSummary()">
+<input type="date" id="fromDate" onchange="updateSummary()">
 </div>
 
 <div class="field">
-<input type="date" id="toDate" oninput="updateSummary()">
+<input type="date" id="toDate" onchange="updateSummary()">
 </div>
 
 <!-- SUMMARY -->
@@ -386,7 +386,9 @@ method: "POST",
 headers: {
 "Content-Type": "application/json"
 },
-body: JSON.stringify({ message: text })
+body: JSON.stringify({
+message: text
+})
 });
 
 document.getElementById("result").innerHTML = "✅ Booking Sent Successfully";
