@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Vidhwaan Booking</title>
+
+<meta name="description" content="Book Vidhwaans near you.">
+
+<link rel="canonical" id="canonical">
+
+</head>
+
+<body>
+
+<h1 id="title"></h1>
+
+<p id="desc"></p>
+
+<div id="registration"></div>
+
+<script type="module">
+
+import { loadRegistration } from "/utilities/registration.js";
+
+/* 🔥 GET URL PARTS */
+const path = location.pathname.split("/").filter(Boolean);
+
+/*
+Expected:
+geo/state/district/mandal/village
+*/
+
+let state = path[1] || "";
+let district = path[2] || "";
+let mandal = path[3] || "";
+let village = path[4] || "";
+
+/* FORMAT TEXT */
+function format(s){
+return s.replaceAll("-", " ").replace(/\b\w/g, l => l.toUpperCase());
+}
+
+const villageName = format(village);
+const mandalName = format(mandal);
+const districtName = format(district);
+const stateName = format(state);
+
+/* 🔥 SEO TITLE */
+document.title = `Book Nadaswaram & Dolu in ${villageName} | Vidhwaan`;
+
+/* 🔥 META DESCRIPTION */
+const desc = `Book Nadaswaram, Dolu, Saxophone and Drum artists in ${villageName}, ${mandalName}, ${districtName}, ${stateName}.`;
+
+let meta = document.querySelector("meta[name='description']");
+if(meta) meta.setAttribute("content", desc);
+
+/* 🔥 CANONICAL */
+document.getElementById("canonical")
+.setAttribute("href", location.href);
+
+/* 🔥 PAGE CONTENT */
+document.getElementById("title").innerText =
+`Book Vidhwaans in ${villageName}`;
+
+document.getElementById("desc").innerText = desc;
+
+/* LOAD BOOKING UI */
+loadRegistration();
+
+</script>
+
+</body>
+</html>
