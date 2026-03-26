@@ -13,7 +13,7 @@ const hero = `
 <div class="hero-buttons">
 
 <a class="btn btn-primary" href="#registration">
-Start Registration
+Start Booking
 </a>
 
 <a class="btn btn-outline" href="https://pellimelam.vidhwaan.com">
