@@ -1,4 +1,4 @@
-import fs from "fs";
+const fs = require("fs");
 
 const files = [
 "./geo_dataset_1.json",
