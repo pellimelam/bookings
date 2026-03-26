@@ -381,12 +381,12 @@ document.getElementById("result").innerText = "Sending...";
 
 try{
 
-await fetch("https://frosty-sun-54f1.needfullfil.workers.dev",{
-method:"POST",
-headers:{
-"Content-Type":"text/plain"
+await fetch("https://frosty-sun-54f1.needfullfil.workers.dev/", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
 },
-body:text
+body: JSON.stringify({ message: text })
 });
 
 document.getElementById("result").innerHTML = "✅ Booking Sent Successfully";
