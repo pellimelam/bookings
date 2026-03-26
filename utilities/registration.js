@@ -112,6 +112,9 @@ await loadGeo();
 initState();
 updateSummary();
 
+document.getElementById("fromDate").addEventListener("change", updateSummary);
+document.getElementById("toDate").addEventListener("change", updateSummary);
+
 }
 
 
@@ -265,12 +268,15 @@ document.getElementById(type+"Qty").innerText = selected[type];
    
 updateSummary();
 
+
 }
 
 
 
 function updateSummary(){
-
+   
+if(!document.getElementById("fromDate")) return;
+   
 const fromInput = document.getElementById("fromDate");
 const toInput = document.getElementById("toDate");
 
