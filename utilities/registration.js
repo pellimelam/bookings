@@ -63,7 +63,7 @@ Book Vidhwaans
 
 <!-- USER DETAILS -->
 <div class="field"><input id="name" placeholder="Your Name"></div>
-<div class="field"><input id="phone" placeholder="Mobile Number"></div>
+<div class="field"><input id="phone" placeholder="Mobile Number" maxlength="10" oninput="validatePhone(this)"></div>
 
 <!-- VIDHWAAN SELECTION -->
 <div style="margin-top:15px">
@@ -76,12 +76,13 @@ ${vidwaanRow("drum","Drum")}
 </div>
 
 <!-- DATE -->
+<!-- DATE -->
 <div class="field">
-<input type="date" id="fromDate" onchange="updateSummary()">
+<input type="date" id="fromDate" oninput="updateSummary()">
 </div>
 
 <div class="field">
-<input type="date" id="toDate" onchange="updateSummary()">
+<input type="date" id="toDate" oninput="updateSummary()">
 </div>
 
 <!-- SUMMARY -->
@@ -260,9 +261,12 @@ selected[type] = Math.max(0, selected[type] + delta);
 
 document.getElementById(type+"Qty").innerText = selected[type];
 
+
+   
 updateSummary();
 
 }
+
 
 
 function updateSummary(){
@@ -272,14 +276,6 @@ const toInput = document.getElementById("toDate");
 
 const from = fromInput.value;
 const to = toInput.value;
-
-let days = 0;
-
-if(from && to){
-const d1 = new Date(from);
-const d2 = new Date(to);
-days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
-}
 
 let items = Object.entries(selected)
 .filter(([k,v])=>v>0)
@@ -294,12 +290,36 @@ return `${names[k]} (${v})`;
 })
 .join(", ");
 
+if(!from || !to){
 document.getElementById("summary").innerHTML = `
 <b>Selected:</b> ${items || "None"}<br>
-<b>Dates:</b> ${from || "-"} → ${to || "-"}<br>
+<b>Dates:</b> - → -<br>
+<b>Days:</b> 0
+`;
+return;
+}
+
+let days = 0;
+
+const d1 = new Date(from);
+const d2 = new Date(to);
+days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
+
+document.getElementById("summary").innerHTML = `
+<b>Selected:</b> ${items || "None"}<br>
+<b>Dates:</b> ${formatDate(from)} → ${formatDate(to)}<br>
 <b>Days:</b> ${days}
 `;
 
+}
+
+
+
+
+
+function formatDate(d){
+const [y,m,day] = d.split("-");
+return `${day}-${m}-${y}`;
 }
 
 window.bookNow = async function(){
@@ -374,4 +394,18 @@ document.getElementById("result").innerHTML = "❌ Failed. Try again.";
 
 }
 
+window.validatePhone = function(input){
 
+input.value = input.value.replace(/\D/g, ""); // only numbers
+
+if(input.value.length > 10){
+input.value = input.value.slice(0,10);
+}
+
+if(input.value.length === 10){
+input.style.border = "1px solid #22c55e"; // green
+}else{
+input.style.border = "1px solid #ef4444"; // red
+}
+
+}
