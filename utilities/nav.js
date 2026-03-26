@@ -22,6 +22,7 @@ const nav = `
 <a href="https://vidhwaan.com">Home</a>
 <a href="https://pellimelam.vidhwaan.com">PelliMelam</a>
 <a href="https://tech.vidhwaan.com">Technology</a>
+<a href="https://ai.vidhwaan.com">AI</a>
 <a href="https://foundation.vidhwaan.com">Foundation</a>
 
 </nav>
