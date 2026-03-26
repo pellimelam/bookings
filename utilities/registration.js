@@ -92,6 +92,10 @@ ${vidwaanRow("drum","Drum")}
 Book Now
 </button>
 
+<button id="installBtn" style="margin-top:10px;width:100%;display:none;">
+Download App
+</button>
+
 <div id="result" style="margin-top:12px;text-align:center;"></div>
 
 </div>
@@ -438,3 +442,25 @@ input.style.border = "1px solid #ef4444"; // red
 }
 
 }
+
+
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  const btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "block";
+});
+
+document.addEventListener("click", async (e) => {
+  if (e.target && e.target.id === "installBtn") {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+
+      e.target.style.display = "none"; // hide after install
+    }
+  }
+});
