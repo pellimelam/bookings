@@ -78,11 +78,11 @@ ${vidwaanRow("drum","Drum")}
 <!-- DATE -->
 <!-- DATE -->
 <div class="field">
-<input type="date" id="fromDate" onchange="updateSummary()">
+<input type="date" id="fromDate">
 </div>
 
 <div class="field">
-<input type="date" id="toDate" onchange="updateSummary()">
+<input type="date" id="fromDate">
 </div>
 
 <!-- SUMMARY -->
@@ -92,9 +92,10 @@ ${vidwaanRow("drum","Drum")}
 Book Now
 </button>
 
-<button id="installBtn" style="margin-top:10px;width:100%;display:none;">
+<button id="installBtn" class="btn btn-primary" style="margin-top:10px;width:100%;display:none;">
 Download App
 </button>
+
 
 <div id="result" style="margin-top:12px;text-align:center;"></div>
 
@@ -446,21 +447,28 @@ input.style.border = "1px solid #ef4444"; // red
 
 let deferredPrompt;
 
+const installBtnHandler = async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt = null;
+
+    const btn = document.getElementById("installBtn");
+    if (btn) btn.style.display = "none";
+  }
+};
+
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
 
   const btn = document.getElementById("installBtn");
-  if (btn) btn.style.display = "block";
+  if (btn) {
+    btn.style.display = "block";
+    btn.onclick = installBtnHandler;
+  }
 });
 
-document.addEventListener("click", async (e) => {
-  if (e.target && e.target.id === "installBtn") {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt = null;
-
-      e.target.style.display = "none"; // hide after install
-    }
-  }
+window.addEventListener("appinstalled", () => {
+  const btn = document.getElementById("installBtn");
+  if (btn) btn.style.display = "none";
 });
