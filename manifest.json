@@ -1,6 +1,6 @@
 {
-  "name": "Vidhwaan App",
-  "short_name": "Vidhwaan",
+  "name": "Vidhwaan Booking",
+  "short_name": "Booking",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
