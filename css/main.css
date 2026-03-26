@@ -155,8 +155,12 @@ background:transparent;
 color:white;
 border-radius:10px;
 font-size:14px;
+}
+
+
+#registration .field{
 position:relative;
-z-index:2;   /* ✅ clickable fix */
+z-index:1;
 }
 
 /* PLACEHOLDER */
