@@ -13,6 +13,8 @@
 
 <meta name="robots" content="index, follow">
 
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large">
+
 <link rel="canonical" id="canonical" href="https://booking.vidhwaan.com/">
 
 <meta property="og:title" content="Book Vidhwaans in India">
@@ -86,8 +88,9 @@ if(location.hash){
 
 const parts = path.split("/").filter(Boolean);
 
-/* GEO SEO */
-/* GEO SEO (FULL FINAL VERSION) */
+
+/* GEO SEO (HIDDEN FINAL VERSION) */
+/* GEO SEO (TOP RANKING VERSION) */
 if(parts[0] === "geo"){
 
   function format(s){
@@ -102,52 +105,27 @@ if(parts[0] === "geo"){
   let title = "Book Vidhwaans in India";
   let desc = "Book Nadaswaram, Dolu artists anywhere in India.";
 
-  let content = "";
+  let displayText = "";
+  let richContent = "";
+
+  const locationName = village || mandal || district || state;
 
   if(village){
     title = `Book Nadaswaram & Dolu in ${village}`;
-    desc = `Book Nadaswaram, Dolu artists in ${village}, ${mandal}, ${district}, ${state}.`;
+    desc = `Book Nadaswaram, Dolu, Saxophone and Drum artists in ${village}, ${mandal}, ${district}, ${state}.`;
 
-    content = `
-      <h1>Book Nadaswaram & Dolu in ${village}</h1>
-      <p>Professional Vidhwaans available in ${village}, ${mandal}, ${district}, ${state} for weddings and temple events.</p>
+    displayText = `Nadaswaram & Dolu artists available in ${village}.`;
 
-      <h2>Why Choose Vidhwaan in ${village}</h2>
+    richContent = `
+      <h2>Best Vidhwaans in ${village}</h2>
+      <p>Professional Nadaswaram, Dolu, Saxophone and Drum artists are available in ${village} for weddings, temple events, and functions.</p>
+
+      <h2>Services Available</h2>
       <ul>
-        <li>Professional Nadaswaram artists</li>
-        <li>Traditional Dolu melam teams</li>
-        <li>Available for weddings and temple events</li>
+        <li>Nadaswaram for weddings</li>
+        <li>Dolu melam teams</li>
+        <li>Temple and procession music</li>
       </ul>
-
-      <h2>Events Covered</h2>
-      <p>Weddings, housewarming, temple festivals and cultural programs.</p>
-    `;
-  }
-  else if(mandal){
-    title = `Vidhwaans in ${mandal}`;
-    desc = `Book artists in ${mandal}, ${district}, ${state}.`;
-
-    content = `
-      <h1>Vidhwaans in ${mandal}</h1>
-      <p>Find Nadaswaram and Dolu artists in ${mandal}, ${district}, ${state}.</p>
-    `;
-  }
-  else if(district){
-    title = `Book Vidhwaans in ${district}`;
-    desc = `Wedding artists in ${district}, ${state}.`;
-
-    content = `
-      <h1>Book Vidhwaans in ${district}</h1>
-      <p>Wedding and event artists available in ${district}, ${state}.</p>
-    `;
-  }
-  else if(state){
-    title = `Vidhwaans in ${state}`;
-    desc = `Book Nadaswaram and Dolu across ${state}.`;
-
-    content = `
-      <h1>Vidhwaans in ${state}</h1>
-      <p>Book professional Vidhwaans across ${state}.</p>
     `;
   }
 
@@ -168,57 +146,65 @@ if(parts[0] === "geo"){
   let meta = document.querySelector("meta[name='description']");
   if(meta) meta.setAttribute("content", desc);
 
-  /* CONTENT */
+  /* SAFE MINIMAL UI CONTENT */
   const seoDiv = document.getElementById("seo-content");
   if(seoDiv){
-    seoDiv.innerHTML = content + `
-      <p>Book traditional Nadaswaram, Dolu, Saxophone and Drum artists for weddings, temple events and functions near you.</p>
+    seoDiv.innerHTML = `
+      <p style="text-align:center; opacity:0.6; font-size:12px;">
+        ${displayText}
+      </p>
+      <div style="display:none;">
+        ${richContent}
+      </div>
     `;
   }
 
-  /* FAQ SCHEMA (BOOST) */
+  /* FAQ SCHEMA */
   const faq = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [{
       "@type": "Question",
-      "name": `Can I book Nadaswaram in ${village || district || state}?`,
+      "name": `Can I book Nadaswaram in ${locationName}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, professional Vidhwaans are available for booking."
+        "text": "Yes, professional Vidhwaans are available for weddings and events."
       }
     }]
   };
 
-  const script = document.createElement("script");
-  script.type = "application/ld+json";
-  script.text = JSON.stringify(faq);
-  document.head.appendChild(script);
+  /* BREADCRUMB SCHEMA */
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": state,
+        "item": `https://booking.vidhwaan.com/#/geo/${parts[1]}/`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": district,
+        "item": `https://booking.vidhwaan.com/#/geo/${parts[1]}/${parts[2]}/`
+      }
+    ]
+  };
+
+  const faqScript = document.createElement("script");
+  faqScript.type = "application/ld+json";
+  faqScript.text = JSON.stringify(faq);
+  document.head.appendChild(faqScript);
+
+  const breadcrumbScript = document.createElement("script");
+  breadcrumbScript.type = "application/ld+json";
+  breadcrumbScript.text = JSON.stringify(breadcrumb);
+  document.head.appendChild(breadcrumbScript);
 }
+  
 
-/* INTERNAL LINKING (FINAL CLEAN VERSION) */
-if(parts[0] === "geo" && parts[1]){
-
-  const seoDiv = document.getElementById("seo-content");
-
-  if(seoDiv){
-    seoDiv.innerHTML += `
-      <div style="padding-top:20px;">
-        <h3>Explore Nearby Locations</h3>
-
-        <a href="/#/geo/${parts[1]}/">
-          Vidhwaans in ${parts[1].replaceAll("-", " ")}
-        </a><br>
-
-        ${parts[2] ? `
-          <a href="/#/geo/${parts[1]}/${parts[2]}/">
-            Vidhwaans in ${parts[2].replaceAll("-", " ")}
-          </a>
-        ` : ""}
-      </div>
-    `;
-  }
-}
   
 /* NORMAL LOAD */
 loadNav()
