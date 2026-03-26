@@ -22,20 +22,20 @@ for (const file of files) {
   for (const stateKey in data) {
     const state = data[stateKey];
 
-    urls.push(`https://booking.vidhwaan.com/geo/${stateKey}/`);
+    urls.push(`https://booking.vidhwaan.com/#/geo/${stateKey}/`);
 
     for (const districtKey in state.districts) {
       const district = state.districts[districtKey];
 
-      urls.push(`https://booking.vidhwaan.com/geo/${stateKey}/${districtKey}/`);
+      urls.push(`https://booking.vidhwaan.com/#/geo/${stateKey}/${districtKey}/`);
 
       for (const subKey in district.subdistricts) {
         const sub = district.subdistricts[subKey];
 
-        urls.push(`https://booking.vidhwaan.com/geo/${stateKey}/${districtKey}/${subKey}/`);
+        urls.push(`https://booking.vidhwaan.com/#/geo/${stateKey}/${districtKey}/${subKey}/`);
 
         sub.villages.forEach(v => {
-          urls.push(`https://booking.vidhwaan.com/geo/${stateKey}/${districtKey}/${subKey}/${v.slug}/`);
+          urls.push(`https://booking.vidhwaan.com/#/geo/${stateKey}/${districtKey}/${subKey}/${v.slug}/`);
         });
 
       }
