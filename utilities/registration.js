@@ -333,13 +333,34 @@ window.bookNow = async function(){
 const name = document.getElementById("name").value.trim();
 const phone = document.getElementById("phone").value.trim();
 
-const state = document.getElementById("state").value;
-const district = document.getElementById("district").value;
-const subdistrict = document.getElementById("subdistrict").value;
-const village = document.getElementById("village").value;
+const stateKey = document.getElementById("state").value;
+const districtKey = document.getElementById("district").value;
+const subKey = document.getElementById("subdistrict").value;
+const villageSlug = document.getElementById("village").value;
+
+const stateName = GEO[stateKey]?.name || "";
+const districtName = GEO[stateKey]?.districts[districtKey]?.name || "";
+const subName = GEO[stateKey]?.districts[districtKey]?.subdistricts[subKey]?.name || "";
+
+let villageName = "";
+let pincode = "";
+
+const villages = GEO[stateKey]?.districts[districtKey]?.subdistricts[subKey]?.villages || [];
+
+const v = villages.find(x => x.slug === villageSlug);
+
+if(v){
+villageName = v.name;
+pincode = v.pincode;
+}
+
 
 const from = document.getElementById("fromDate").value;
 const to = document.getElementById("toDate").value;
+
+const d1 = new Date(from);
+const d2 = new Date(to);
+const days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
 
 if(!name || !phone || !from || !to){
 alert("Please fill all details");
@@ -368,13 +389,13 @@ const text = `
 📞 Phone: ${phone}
 
 📍 Location:
-${state} / ${district} / ${subdistrict} / ${village}
+${villageName} Village, ${subName} Mandal, ${districtName} District, ${stateName} - ${pincode}
 
 🎶 Vidhwaans:
 ${selectedList.map(([k,v])=>`${k} - ${v}`).join("\n")}
 
 📅 Dates:
-${from} → ${to}
+${from} → ${to} (${days} days)
 `;
 
 document.getElementById("result").innerText = "Sending...";
