@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Vidhwaan Community Registration</title>
+
+<meta name="description" content="Register as a Vidhwaan and create your official profile in the Vidhwaan community.">
+
+<link rel="icon" href="/favicon.ico">
+
+<!-- CSS -->
+<link rel="stylesheet" href="./css/design-system.css">
+<link rel="stylesheet" href="./css/main.css">
+
+</head>
+
+<body>
+
+<!-- NAV -->
+<div id="nav"></div>
+
+<!-- HERO -->
+<div id="hero"></div>
+
+<!-- REGISTRATION -->
+<div id="registration"></div>
+
+<div id="edit"></div>
+
+<div id="app"></div>
+
+<!-- FOOTER -->
+<div id="footer"></div>
+
+
+<!-- MODULE LOAD -->
+<script type="module">
+
+import { loadNav } from "./utilities/nav.js"
+import { loadHero } from "./utilities/hero.js"
+import { loadFooter } from "./utilities/footer.js"
+import { loadRegistration } from "./utilities/registration.js"
+import { loadSupport } from "./utilities/support.js"
+import { initRouter } from "./utilities/router.js"   // ✅ ADD THIS
+
+const isProfile = window.location.pathname.match(/\d{10}$/);
+
+if(!isProfile){
+loadNav()
+loadHero()
+loadRegistration()
+loadFooter()
+loadSupport()
+}
+
+initRouter();
+
+</script>
+
+
+<!-- REGISTER FUNCTION -->
+
+<script type="module">
+
+import { initRouter } from "./utilities/router.js"
+
+import { checkRepo, createRepo, createUserSite } from "./utilities/github.js";
+
+window.registerUser = async function(){
+
+const state = document.getElementById("state").value;
+const district = document.getElementById("district").value;
+const subdistrict = document.getElementById("subdistrict").value;
+const village = document.getElementById("village").value;
+
+const firstName = document.getElementById("firstName").value.trim();
+const lastName = document.getElementById("lastName").value.trim();
+const phone = document.getElementById("phone").value.trim();
+const instrument = document.getElementById("instrument").value;
+
+/* VALIDATION */
+
+if(!state || !district || !subdistrict || !village){
+alert("Please select complete location");
+return;
+}
+
+if(!firstName || !lastName || !phone || !instrument){
+alert("Please fill all details");
+return;
+}
+
+if(!/^[6-9][0-9]{9}$/.test(phone)){
+alert("Enter valid mobile number");
+return;
+}
+
+/* CHECK */
+
+/* CHECK */
+
+const resultEl = document.getElementById("result");
+
+resultEl.innerHTML = "Checking...";
+
+const exists = await checkRepo(phone);
+
+if(exists){
+resultEl.innerHTML = `
+<div style="color:#ef4444;margin-top:10px;">
+❌ Profile already exists with this phone number.<br>
+Contact via WhatsApp (bottom right).
+</div>
+`;
+return;
+}
+
+/* CREATE */
+
+resultEl.innerHTML = "Creating profile...";
+
+const status = await createRepo(phone);
+
+if(status !== "created"){
+resultEl.innerHTML = `
+<div style="color:#ef4444;margin-top:10px;">
+❌ Error creating profile. Please try again.
+</div>
+`;
+return;
+}
+
+/* DATA OBJECT */
+
+const data = {
+  version: 1,   // ✅ ADD THIS
+  firstName,
+  lastName,
+  phone,
+  instrument,
+  location:{
+    state,
+    district,
+    subdistrict,
+    village
+  },
+  gallery: [],
+  videos: [],
+};
+
+/* CREATE SITE */
+
+await createUserSite({
+...data,
+village
+});
+
+/* FINAL URL */
+
+const slug = `${firstName}${lastName}${phone}`.toLowerCase();
+function slugify(str){
+return str.toLowerCase().replace(/\s+/g,"-");
+}
+
+const geoPath = `
+${slugify(state)}/
+${slugify(district)}/
+${slugify(subdistrict)}/
+${slugify(village)}/
+${slugify(instrument)}/
+${slug}
+`.replace(/\n/g,"");
+
+const url = `https://registry.vidhwaan.com/${slug}`;
+
+document.getElementById("result").innerHTML = `
+<div style="
+padding:16px;
+border-radius:10px;
+margin-top:15px;
+text-align:center;
+background:rgba(255,255,255,0.03);
+">
+
+<h3 style="margin-bottom:10px;color:#22c55e;">
+✅ Profile Created Successfully
+</h3>
+
+<p style="color:#94a3b8;font-size:14px;margin-bottom:10px;">
+Save or open your profile link
+</p>
+
+<a href="${url}" target="_blank"
+style="
+display:block;
+word-break:break-all;
+color:#60a5fa;
+text-decoration:none;
+font-size:13px;
+margin-bottom:12px;
+">
+${url}
+</a>
+
+<button onclick="navigator.clipboard.writeText('${url}')"
+style="
+background:#2563eb;
+color:white;
+padding:10px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+">
+Copy URL
+</button>
+
+</div>
+`;
+
+alert("Profile created 🚀");
+
+}
+
+</script> 
+
+
+<!-- OPTIONAL CARD HOVER EFFECT -->
+<script>
+
+document.addEventListener("mousemove", (e) => {
+
+document.querySelectorAll(".card").forEach(card => {
+
+const rect = card.getBoundingClientRect();
+
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+
+card.style.setProperty("--x", x + "px");
+card.style.setProperty("--y", y + "px");
+
+});
+
+});
+
+</script>
+
+
+  
+</body>
+</html>
