@@ -13,7 +13,7 @@
 
 <meta name="robots" content="index, follow">
 
-<link rel="canonical" href="https://booking.vidhwaan.com/">
+<link rel="canonical" id="canonical" href="https://booking.vidhwaan.com/">
 
 <meta property="og:title" content="Book Vidhwaans in India">
 <meta property="og:description" content="Nadaswaram, Dolu, Saxophone & Drum booking platform across India.">
@@ -58,6 +58,10 @@
 
 <!-- BOOKING -->
 
+<!-- SEO CONTENT -->
+<div id="seo-content" style="padding:20px;"></div>
+
+<!-- BOOKING -->
 <div id="registration"></div>
 
 <!-- FOOTER -->
@@ -83,25 +87,139 @@ if(location.hash){
 const parts = path.split("/").filter(Boolean);
 
 /* GEO SEO */
+/* GEO SEO (FULL FINAL VERSION) */
 if(parts[0] === "geo"){
 
   function format(s){
-    return s.replaceAll("-", " ").replace(/\b\w/g, l => l.toUpperCase());
+    return s ? s.replaceAll("-", " ").replace(/\b\w/g, l => l.toUpperCase()) : "";
   }
 
-  const state = format(parts[1] || "");
-  const district = format(parts[2] || "");
-  const mandal = format(parts[3] || "");
-  const village = format(parts[4] || "");
+  const state = format(parts[1]);
+  const district = format(parts[2]);
+  const mandal = format(parts[3]);
+  const village = format(parts[4]);
 
-  document.title = `Book Nadaswaram & Dolu in ${village} | Vidhwaan`;
+  let title = "Book Vidhwaans in India";
+  let desc = "Book Nadaswaram, Dolu artists anywhere in India.";
 
-  const desc = `Book Nadaswaram, Dolu, Saxophone and Drum artists in ${village}, ${mandal}, ${district}, ${state}.`;
+  let content = "";
 
+  if(village){
+    title = `Book Nadaswaram & Dolu in ${village}`;
+    desc = `Book Nadaswaram, Dolu artists in ${village}, ${mandal}, ${district}, ${state}.`;
+
+    content = `
+      <h1>Book Nadaswaram & Dolu in ${village}</h1>
+      <p>Professional Vidhwaans available in ${village}, ${mandal}, ${district}, ${state} for weddings and temple events.</p>
+
+      <h2>Why Choose Vidhwaan in ${village}</h2>
+      <ul>
+        <li>Professional Nadaswaram artists</li>
+        <li>Traditional Dolu melam teams</li>
+        <li>Available for weddings and temple events</li>
+      </ul>
+
+      <h2>Events Covered</h2>
+      <p>Weddings, housewarming, temple festivals and cultural programs.</p>
+    `;
+  }
+  else if(mandal){
+    title = `Vidhwaans in ${mandal}`;
+    desc = `Book artists in ${mandal}, ${district}, ${state}.`;
+
+    content = `
+      <h1>Vidhwaans in ${mandal}</h1>
+      <p>Find Nadaswaram and Dolu artists in ${mandal}, ${district}, ${state}.</p>
+    `;
+  }
+  else if(district){
+    title = `Book Vidhwaans in ${district}`;
+    desc = `Wedding artists in ${district}, ${state}.`;
+
+    content = `
+      <h1>Book Vidhwaans in ${district}</h1>
+      <p>Wedding and event artists available in ${district}, ${state}.</p>
+    `;
+  }
+  else if(state){
+    title = `Vidhwaans in ${state}`;
+    desc = `Book Nadaswaram and Dolu across ${state}.`;
+
+    content = `
+      <h1>Vidhwaans in ${state}</h1>
+      <p>Book professional Vidhwaans across ${state}.</p>
+    `;
+  }
+
+  /* TITLE */
+  document.title = title;
+
+  /* CANONICAL */
+  const canonical = document.getElementById("canonical");
+  if (canonical) {
+    const cleanPath = path.replace(/^\/+/, "");
+    canonical.setAttribute(
+      "href",
+      cleanPath ? location.origin + "/#" + cleanPath : location.origin + "/"
+    );
+  }
+
+  /* META */
   let meta = document.querySelector("meta[name='description']");
   if(meta) meta.setAttribute("content", desc);
+
+  /* CONTENT */
+  const seoDiv = document.getElementById("seo-content");
+  if(seoDiv){
+    seoDiv.innerHTML = content + `
+      <p>Book traditional Nadaswaram, Dolu, Saxophone and Drum artists for weddings, temple events and functions near you.</p>
+    `;
+  }
+
+  /* FAQ SCHEMA (BOOST) */
+  const faq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{
+      "@type": "Question",
+      "name": `Can I book Nadaswaram in ${village || district || state}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, professional Vidhwaans are available for booking."
+      }
+    }]
+  };
+
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.text = JSON.stringify(faq);
+  document.head.appendChild(script);
 }
 
+/* INTERNAL LINKING (FINAL CLEAN VERSION) */
+if(parts[0] === "geo" && parts[1]){
+
+  const seoDiv = document.getElementById("seo-content");
+
+  if(seoDiv){
+    seoDiv.innerHTML += `
+      <div style="padding-top:20px;">
+        <h3>Explore Nearby Locations</h3>
+
+        <a href="/#/geo/${parts[1]}/">
+          Vidhwaans in ${parts[1].replaceAll("-", " ")}
+        </a><br>
+
+        ${parts[2] ? `
+          <a href="/#/geo/${parts[1]}/${parts[2]}/">
+            Vidhwaans in ${parts[2].replaceAll("-", " ")}
+          </a>
+        ` : ""}
+      </div>
+    `;
+  }
+}
+  
 /* NORMAL LOAD */
 loadNav()
 loadHero()
