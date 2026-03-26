@@ -86,10 +86,53 @@ if(location.hash){
   path = location.hash.slice(1);
 }
 
-const parts = path.split("/").filter(Boolean);
+/* 🔥 FINAL ROUTING SYSTEM (NORMALIZE + VALIDATE + PREVENT DUPLICATES) */
+
+/* normalize path */
+let cleanPath = path
+  .replace(/\/+/g, "/")     // remove multiple slashes
+  .replace(/\/$/, "")       // remove trailing slash
+  .toLowerCase();
+
+/* enforce geo trailing slash */
+if(cleanPath.startsWith("/geo")){
+  cleanPath = cleanPath + "/";
+}
+
+/* redirect if not clean */
+if(cleanPath !== path){
+  location.replace("/#" + cleanPath);
+}
+
+/* split parts */
+const parts = cleanPath.split("/").filter(Boolean);
+
+/* 🔒 STRICT GEO VALIDATION */
+if(parts[0] === "geo"){
+
+  /* valid depth only */
+  if(parts.length < 2 || parts.length > 5){
+    location.replace("/");
+  }
+
+  /* valid slug check */
+  const isValidSlug = (s) => /^[a-z0-9-]+$/.test(s);
+
+  for(let i = 1; i < parts.length; i++){
+    if(!isValidSlug(parts[i])){
+      location.replace("/");
+    }
+  }
+
+} else {
+  /* ❌ block everything except homepage */
+  if(parts.length > 0){
+    location.replace("/");
+  }
+}
 
 
-/* GEO SEO (HIDDEN FINAL VERSION) */
+
 /* GEO SEO (TOP RANKING VERSION) */
 if(parts[0] === "geo"){
 
