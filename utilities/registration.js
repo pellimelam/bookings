@@ -82,7 +82,7 @@ ${vidwaanRow("drum","Drum")}
 </div>
 
 <div class="field">
-<input type="date" id="fromDate">
+<input type="date" id="toDate">
 </div>
 
 <!-- SUMMARY -->
