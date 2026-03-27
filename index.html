@@ -91,10 +91,19 @@ if(location.hash){
 /* 🔥 FINAL CLEAN ROUTING (NO # ON HOMEPAGE + STRICT GEO ONLY) */
 
 /* handle path */
+
+
+  
 let cleanPath = path
   .replace(/\/+/g, "/")
   .replace(/\/$/, "")
   .toLowerCase();
+
+/* ❌ block /geo/ only */
+if(parts.length === 1){
+  location.replace("/");
+  return;
+}
 
 /* 🚫 DO NOT TOUCH HOMEPAGE */
 if(cleanPath === "" || cleanPath === "/"){
