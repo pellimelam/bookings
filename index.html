@@ -99,11 +99,7 @@ let cleanPath = path
   .replace(/\/$/, "")
   .toLowerCase();
 
-/* ❌ block /geo/ only */
-if(parts.length === 1){
-  location.replace("/");
-  return;
-}
+
 
 /* 🚫 DO NOT TOUCH HOMEPAGE */
 if(cleanPath === "" || cleanPath === "/"){
