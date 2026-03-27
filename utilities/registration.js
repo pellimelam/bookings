@@ -77,11 +77,35 @@ ${vidwaanRow("drum","Drum")}
 
 <!-- DATE -->
 <!-- DATE -->
-<div class="field">
+<div class="field" style="position:relative;">
+<label style="
+position:absolute;
+top:-8px;
+left:12px;
+font-size:11px;
+opacity:0.7;
+background:#0f172a;
+padding:0 6px;
+border-radius:4px;
+">
+From
+</label>
 <input type="date" id="fromDate">
 </div>
 
-<div class="field">
+<div class="field" style="position:relative;">
+<label style="
+position:absolute;
+top:-8px;
+left:12px;
+font-size:11px;
+opacity:0.7;
+background:#0f172a;
+padding:0 6px;
+border-radius:4px;
+">
+To
+</label>
 <input type="date" id="toDate">
 </div>
 
