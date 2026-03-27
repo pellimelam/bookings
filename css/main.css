@@ -1,18 +1,17 @@
-
 /* =========================
-   BACKGROUND
+BACKGROUND (UPGRADED)
 ========================= */
 
 body{
 background:
-radial-gradient(circle at 20% 20%, #1e293b 0%, transparent 40%),
-radial-gradient(circle at 80% 0%, #1e40af 0%, transparent 40%),
-#0f172a;
+radial-gradient(circle at 20% 20%, rgba(59,130,246,0.25), transparent 45%),
+radial-gradient(circle at 80% 0%, rgba(37,99,235,0.35), transparent 50%),
+radial-gradient(circle at 50% 100%, rgba(14,165,233,0.15), transparent 60%),
+#020617;
 }
 
-
 /* =========================
-   WRAPPER
+WRAPPER
 ========================= */
 
 .wrapper{
@@ -21,9 +20,8 @@ margin:auto;
 padding:120px 20px 80px;
 }
 
-
 /* =========================
-   HERO BUTTONS
+HERO BUTTONS
 ========================= */
 
 .hero-buttons{
@@ -44,13 +42,15 @@ cursor:pointer;
 border:none;
 }
 
+/* 🔥 BUTTON UPGRADE */
 .btn-primary{
-background:#2563eb;
+background:linear-gradient(90deg,#2563eb,#3b82f6);
 color:white;
+box-shadow:0 6px 20px rgba(37,99,235,0.4);
 }
 
 .btn-primary:hover{
-background:#1d4ed8;
+background:linear-gradient(90deg,#1d4ed8,#2563eb);
 }
 
 .btn-outline{
@@ -63,15 +63,21 @@ border-color:#2563eb;
 color:white;
 }
 
-
 /* =========================
-   CARD EFFECT (FIXED)
+CARD EFFECT (UPGRADED)
 ========================= */
 
 .card{
 position:relative;
-overflow:visible;   /* 🔥 FIX */
+overflow:visible;
 z-index:1;
+
+/* 🔥 NEW PREMIUM LOOK */
+background:linear-gradient(180deg,#1e293b,#0f172a);
+border:1px solid rgba(148,163,184,0.15);
+box-shadow:
+0 10px 30px rgba(0,0,0,0.6),
+0 0 0 1px rgba(255,255,255,0.03) inset;
 }
 
 .card::before{
@@ -81,7 +87,7 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-pointer-events:none;   /* ✅ CRITICAL FIX */
+pointer-events:none;
 background:
 radial-gradient(
 circle 200px at var(--x) var(--y),
@@ -96,18 +102,16 @@ transition:.25s;
 opacity:1;
 }
 
-
 /* =========================
-   NAV SHADOW
+NAV SHADOW
 ========================= */
 
 .nav{
 box-shadow:0 10px 30px rgba(0,0,0,.35);
 }
 
-
 /* =========================
-   HERO TEXT
+HERO TEXT (ENHANCED)
 ========================= */
 
 .hero h1{
@@ -116,9 +120,14 @@ background:linear-gradient(90deg,#ffffff,#94a3b8);
 -webkit-text-fill-color:transparent;
 }
 
+/* 🔥 TEXT CLARITY */
+h1, h2{
+letter-spacing:0.3px;
+text-shadow:0 2px 10px rgba(0,0,0,0.5);
+}
 
 /* =========================
-   REGISTRATION FORM (FINAL)
+REGISTRATION FORM (FINAL)
 ========================= */
 
 #registration .card{
@@ -135,12 +144,15 @@ flex-direction:column;
 gap:14px;
 }
 
-/* FIELD WRAPPER */
+/* 🔥 FIELD UPGRADE */
 #registration .field{
 padding:4px;
 border-radius:12px;
-background:#1e293b;
-border:1px solid #334155;
+background:linear-gradient(180deg,#1e293b,#020617);
+border:1px solid rgba(148,163,184,0.3);
+box-shadow:
+0 0 0 1px rgba(255,255,255,0.03) inset,
+0 4px 12px rgba(0,0,0,0.4);
 }
 
 /* INPUT + SELECT */
@@ -156,7 +168,6 @@ color:white;
 border-radius:10px;
 font-size:14px;
 }
-
 
 #registration .field{
 position:relative;
@@ -179,10 +190,12 @@ color:black;
 background:white;
 }
 
-/* FOCUS */
+/* 🔥 FOCUS GLOW */
 #registration input:focus,
 #registration select:focus{
-box-shadow:0 0 0 1px #2563eb;
+box-shadow:
+0 0 0 1px #2563eb,
+0 0 12px rgba(37,99,235,0.6);
 }
 
 /* BUTTON */
@@ -198,7 +211,7 @@ background-clip:padding-box;
 }
 
 /* =========================
-   MOBILE
+MOBILE
 ========================= */
 
 @media (max-width:768px){
