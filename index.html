@@ -87,100 +87,55 @@ if(location.hash){
 }
 
 
-/* 🔥 FINAL PRODUCTION ROUTING + SEO (FIXED) */
 
-let GEO_CACHE = null;
+/* 🔥 FINAL CLEAN ROUTING (NO # ON HOMEPAGE + STRICT GEO ONLY) */
 
-async function loadGeoData(){
-  if(GEO_CACHE) return GEO_CACHE;
+/* handle path */
+let cleanPath = path
+  .replace(/\/+/g, "/")
+  .replace(/\/$/, "")
+  .toLowerCase();
 
-  const [g1, g2, g3, g4] = await Promise.all([
-    fetch("./geo_dataset_1.json").then(r => r.json()),
-    fetch("./geo_dataset_2.json").then(r => r.json()),
-    fetch("./geo_dataset_3.json").then(r => r.json()),
-    fetch("./geo_dataset_4.json").then(r => r.json())
-  ]);
-
-  GEO_CACHE = { ...g1, ...g2, ...g3, ...g4 };
-  return GEO_CACHE;
-}
-
-(async () => {
-
-  const GEO = await loadGeoData();
-
-  let cleanPath = path
-    .replace(/\/+/g, "/")
-    .replace(/\/$/, "")
-    .toLowerCase();
-
-  /* homepage */
-  if(cleanPath === "" || cleanPath === "/"){
-    loadNav()
-    loadHero()
-    loadRegistration()
-    loadFooter()
-    return;
-  }
-
-  /* GEO ROUTE */
-  if(!cleanPath.startsWith("/geo")){
-    location.replace("/");
-    return;
-  }
-
-  const parts = cleanPath.split("/").filter(Boolean);
-
-  let isValid = false;
-
-  try {
-    const state = parts[1];
-    const district = parts[2];
-    const mandal = parts[3];
-    const village = parts[4];
-
-    if(state && GEO[state]){
-
-      if(!district){
-        isValid = true;
-      }
-      else if(GEO[state].districts[district]){
-
-        if(!mandal){
-          isValid = true;
-        }
-        else if(GEO[state].districts[district].subdistricts[mandal]){
-
-          if(!village){
-            isValid = true;
-          }
-          else {
-            const villages = GEO[state].districts[district].subdistricts[mandal].villages;
-            if(villages.some(v => v.slug === village)){
-              isValid = true;
-            }
-          }
-        }
-      }
-    }
-
-  } catch(e){
-    isValid = false;
-  }
-
-  if(!isValid){
-    location.replace("/");
-    return;
-  }
+/* 🚫 DO NOT TOUCH HOMEPAGE */
+if(cleanPath === "" || cleanPath === "/"){
+  // homepage → no redirect, no #
+} 
+else if(cleanPath.startsWith("/geo")){
 
   /* enforce trailing slash */
   cleanPath = cleanPath + "/";
+
   if(cleanPath !== path){
     location.replace("/#" + cleanPath);
-    return;
   }
 
-  /* ================= SEO ================= */
+} 
+else {
+  /* ❌ block everything else */
+  location.replace("/");
+}
+
+/* split */
+const parts = cleanPath.split("/").filter(Boolean);
+
+/* 🔒 STRICT GEO VALIDATION */
+if(parts[0] === "geo"){
+
+  if(parts.length < 2 || parts.length > 5){
+    location.replace("/");
+  }
+
+  const isValidSlug = (s) => /^[a-z0-9-]+$/.test(s);
+
+  for(let i = 1; i < parts.length; i++){
+    if(!isValidSlug(parts[i])){
+      location.replace("/");
+    }
+  }
+}
+
+/* GEO SEO (TOP RANKING VERSION) */
+if(parts[0] === "geo"){
 
   function format(s){
     return s ? s.replaceAll("-", " ").replace(/\b\w/g, l => l.toUpperCase()) : "";
@@ -194,39 +149,112 @@ async function loadGeoData(){
   let title = "Book Vidhwaans in India";
   let desc = "Book Nadaswaram, Dolu artists anywhere in India.";
 
+  let displayText = "";
+  let richContent = "";
+
+  const locationName = village || mandal || district || state;
+
   if(village){
     title = `Book Nadaswaram & Dolu in ${village}`;
-    desc = `Book artists in ${village}, ${mandal}, ${district}, ${state}.`;
+    desc = `Book Nadaswaram, Dolu, Saxophone and Drum artists in ${village}, ${mandal}, ${district}, ${state}.`;
+
+    displayText = `Nadaswaram & Dolu artists available in ${village}.`;
+
+    richContent = `
+      <h2>Best Vidhwaans in ${village}</h2>
+      <p>Professional Nadaswaram, Dolu, Saxophone and Drum artists are available in ${village} for weddings, temple events, and functions.</p>
+
+      <h2>Services Available</h2>
+      <ul>
+        <li>Nadaswaram for weddings</li>
+        <li>Dolu melam teams</li>
+        <li>Temple and procession music</li>
+      </ul>
+    `;
   }
 
+  /* TITLE */
   document.title = title;
 
+  /* CANONICAL */
   const canonical = document.getElementById("canonical");
   if (canonical) {
-    const clean = path.replace(/^\/+/, "");
+    const cleanPath = path.replace(/^\/+/, "");
     canonical.setAttribute(
       "href",
-      clean ? location.origin + "/#" + clean : location.origin + "/"
+      cleanPath ? location.origin + "/#" + cleanPath : location.origin + "/"
     );
   }
 
+  /* META */
   let meta = document.querySelector("meta[name='description']");
   if(meta) meta.setAttribute("content", desc);
 
-  /* minimal SEO content */
+  /* SAFE MINIMAL UI CONTENT */
   const seoDiv = document.getElementById("seo-content");
   if(seoDiv){
-    seoDiv.innerHTML = `<p style="display:none;">${desc}</p>`;
+    seoDiv.innerHTML = `
+      <p style="text-align:center; opacity:0.6; font-size:12px;">
+        ${displayText}
+      </p>
+      <div style="display:none;">
+        ${richContent}
+      </div>
+    `;
   }
 
-  /* ================= LOAD UI ================= */
+  /* FAQ SCHEMA */
+  const faq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{
+      "@type": "Question",
+      "name": `Can I book Nadaswaram in ${locationName}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, professional Vidhwaans are available for weddings and events."
+      }
+    }]
+  };
 
-  loadNav()
-  loadHero()
-  loadRegistration()
-  loadFooter()
+  /* BREADCRUMB SCHEMA */
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": state,
+        "item": `https://booking.vidhwaan.com/#/geo/${parts[1]}/`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": district,
+        "item": `https://booking.vidhwaan.com/#/geo/${parts[1]}/${parts[2]}/`
+      }
+    ]
+  };
 
-})();
+  const faqScript = document.createElement("script");
+  faqScript.type = "application/ld+json";
+  faqScript.text = JSON.stringify(faq);
+  document.head.appendChild(faqScript);
+
+  const breadcrumbScript = document.createElement("script");
+  breadcrumbScript.type = "application/ld+json";
+  breadcrumbScript.text = JSON.stringify(breadcrumb);
+  document.head.appendChild(breadcrumbScript);
+}
+  
+
+  
+/* NORMAL LOAD */
+loadNav()
+loadHero()
+loadRegistration()
+loadFooter()
 
 </script>
 
