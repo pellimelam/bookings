@@ -88,51 +88,111 @@ if(location.hash){
 
 
 
-/* 🔥 FINAL CLEAN ROUTING (NO # ON HOMEPAGE + STRICT GEO ONLY) */
+/* 🔥 FINAL WORLD-CLASS ROUTING (CACHED DATA VERSION) */
 
-/* handle path */
-let cleanPath = path
-  .replace(/\/+/g, "/")
-  .replace(/\/$/, "")
-  .toLowerCase();
+let GEO_CACHE = null;
 
-/* 🚫 DO NOT TOUCH HOMEPAGE */
-if(cleanPath === "" || cleanPath === "/"){
-  // homepage → no redirect, no #
-} 
-else if(cleanPath.startsWith("/geo")){
+/* LOAD DATA ONCE */
+async function loadGeoData(){
+  if(GEO_CACHE) return GEO_CACHE;
 
-  /* enforce trailing slash */
-  cleanPath = cleanPath + "/";
+  const [g1, g2, g3, g4] = await Promise.all([
+    fetch("./geo_dataset_1.json").then(r => r.json()),
+    fetch("./geo_dataset_2.json").then(r => r.json()),
+    fetch("./geo_dataset_3.json").then(r => r.json()),
+    fetch("./geo_dataset_4.json").then(r => r.json())
+  ]);
 
-  if(cleanPath !== path){
-    location.replace("/#" + cleanPath);
-  }
-
-} 
-else {
-  /* ❌ block everything else */
-  location.replace("/");
+  GEO_CACHE = { ...g1, ...g2, ...g3, ...g4 };
+  return GEO_CACHE;
 }
 
-/* split */
-const parts = cleanPath.split("/").filter(Boolean);
+/* MAIN ROUTING */
+(async () => {
 
-/* 🔒 STRICT GEO VALIDATION */
-if(parts[0] === "geo"){
+  const GEO = await loadGeoData();
 
-  if(parts.length < 2 || parts.length > 5){
-    location.replace("/");
+  let cleanPath = path
+    .replace(/\/+/g, "/")
+    .replace(/\/$/, "")
+    .toLowerCase();
+
+  /* homepage */
+  if(cleanPath === "" || cleanPath === "/"){
+    return;
   }
 
-  const isValidSlug = (s) => /^[a-z0-9-]+$/.test(s);
+  /* GEO ROUTE */
+  if(cleanPath.startsWith("/geo")){
 
-  for(let i = 1; i < parts.length; i++){
-    if(!isValidSlug(parts[i])){
-      location.replace("/");
+    const parts = cleanPath.split("/").filter(Boolean);
+
+    let isValid = false;
+
+    try {
+
+      const state = parts[1];
+      const district = parts[2];
+      const mandal = parts[3];
+      const village = parts[4];
+
+      if(state && GEO[state]){
+
+        if(!district){
+          isValid = true;
+        }
+
+        else if(GEO[state].districts[district]){
+
+          if(!mandal){
+            isValid = true;
+          }
+
+          else if(GEO[state].districts[district].subdistricts[mandal]){
+
+            if(!village){
+              isValid = true;
+            }
+
+            else {
+              const villages = GEO[state].districts[district].subdistricts[mandal].villages;
+
+              if(villages.some(v => v.slug === village)){
+                isValid = true;
+              }
+            }
+          }
+        }
+      }
+
+    } catch(e){
+      isValid = false;
     }
+
+    /* ❌ INVALID */
+    if(!isValid){
+      location.replace("/");
+      return;
+    }
+
+    /* enforce trailing slash */
+    cleanPath = cleanPath + "/";
+
+    if(cleanPath !== path){
+      location.replace("/#" + cleanPath);
+      return;
+    }
+
+  } else {
+    location.replace("/");
+    return;
   }
-}
+
+})();
+  
+
+  
+
 
 /* GEO SEO (TOP RANKING VERSION) */
 if(parts[0] === "geo"){
