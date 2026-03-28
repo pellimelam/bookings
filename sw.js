@@ -58,12 +58,15 @@ self.addEventListener("fetch", (event) => {
   if (req.url.includes("/geo/")) {
     event.respondWith(
       caches.match(req).then(cacheRes => {
-        return cacheRes || fetch(req).then(networkRes => {
-          return caches.open(CACHE_NAME).then(cache => {
+
+        const fetchPromise = fetch(req).then(networkRes => {
+          caches.open(CACHE_NAME).then(cache => {
             cache.put(req, networkRes.clone());
-            return networkRes;
           });
-        });
+          return networkRes;
+        }).catch(() => cacheRes);
+
+        return cacheRes || fetchPromise;
       })
     );
     return;
