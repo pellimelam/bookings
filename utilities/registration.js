@@ -17,7 +17,7 @@ margin-bottom:12px;
 ">
 
 <div style="display:flex;align-items:center;gap:10px;">
-<img src="./${key}1.png" style="width:34px;height:34px;border-radius:6px;">
+<img src="./${key}1.png" loading="lazy" style="width:34px;height:34px;border-radius:6px;">
 <span>${label}</span>
 </div>
 
