@@ -134,11 +134,10 @@ Download App
 
 document.getElementById("registration").innerHTML = html;
 
-/* LOAD GEO */
-await loadGeo();
-
-/* INIT DROPDOWN */
-initState();
+loadGeo().then(() => {
+  initState();
+});
+   
 updateSummary();
 
 document.getElementById("fromDate").addEventListener("change", updateSummary);
@@ -153,43 +152,28 @@ document.getElementById("toDate").addEventListener("change", updateSummary);
 
 async function loadGeo(){
 
-if(GEO) return;
+  if(GEO) return;
 
-const files = [
-"./geo_dataset_1.json",
-"./geo_dataset_2.json",
-"./geo_dataset_3.json",
-"./geo_dataset_4.json"
-];
+  const files = [
+    "./geo_dataset_1.json",
+    "./geo_dataset_2.json",
+    "./geo_dataset_3.json",
+    "./geo_dataset_4.json"
+  ];
 
-let merged = {};
+  try {
 
-for(const file of files){
+    const responses = await Promise.all(
+      files.map(f => fetch(f).then(r => r.json()))
+    );
 
-try{
+    GEO = Object.assign({}, ...responses);
 
-const res = await fetch(file);
+    console.log("⚡ GEO INSTANT LOADED:", Object.keys(GEO).length);
 
-if(!res.ok){
-console.error("❌ JSON NOT FOUND:", file);
-continue;
-}
-
-const data = await res.json();
-
-/* merge all */
-Object.assign(merged, data);
-
-}catch(err){
-console.error("❌ ERROR LOADING:", file, err);
-}
-
-}
-
-GEO = merged;
-
-console.log("✅ GEO LOADED:", Object.keys(GEO).length);
-
+  } catch(e){
+    console.error("❌ GEO LOAD FAILED", e);
+  }
 }
 
 
