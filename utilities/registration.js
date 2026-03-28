@@ -1,5 +1,7 @@
 let GEO = null;
 
+const STATE_CACHE = {};
+
 let selected = {
 nadaswaram:0,
 dolu:0,
@@ -17,7 +19,11 @@ margin-bottom:12px;
 ">
 
 <div style="display:flex;align-items:center;gap:10px;">
-<img src="./${key}1.png" loading="lazy" style="width:34px;height:34px;border-radius:6px;">
+<img src="./${key}1.png"
+     loading="lazy"
+     width="34"
+     height="34"
+     style="border-radius:6px;">
 <span>${label}</span>
 </div>
 
@@ -196,15 +202,81 @@ const el = document.getElementById("district");
 
 if(!stateKey){
   el.innerHTML = `<option>Select District</option>`;
+  document.getElementById("subdistrict").innerHTML = `<option>Select Subdistrict</option>`;
+  document.getElementById("village").innerHTML = `<option>Select Village</option>`;
   return;
 }
 
-/* 🔥 fetch only this state */
-const res = await fetch(`./geo/${stateKey}.v1.json`);
-const stateData = await res.json();
+/* loading */
+el.innerHTML = `<option>Loading...</option>`;
+el.disabled = true;
 
-/* store */
-GEO[stateKey] = stateData;
+/* 🔥 RESET LOWER LEVELS */
+document.getElementById("subdistrict").innerHTML = `<option>Select Subdistrict</option>`;
+document.getElementById("village").innerHTML = `<option>Select Village</option>`;
+
+/* 🔥 1. GEO CACHE */
+if(GEO[stateKey] && GEO[stateKey].districts){
+  renderDistrict(GEO[stateKey]);
+  el.disabled = false;
+  return;
+}
+
+/* 🔥 2. MEMORY CACHE */
+if(STATE_CACHE[stateKey]){
+  renderDistrict(STATE_CACHE[stateKey]);
+  GEO[stateKey] = STATE_CACHE[stateKey];
+  el.disabled = false;
+  return;
+}
+
+/* 🔥 3. FETCH */
+try {
+  const res = await fetch(`./geo/${stateKey}.v1.json`);
+  const stateData = await res.json();
+
+  STATE_CACHE[stateKey] = stateData;
+  GEO[stateKey] = stateData;
+
+  renderDistrict(stateData);
+
+} catch (e){
+  console.error("District load failed", e);
+  el.innerHTML = `<option>Failed to load</option>`;
+}
+
+/* enable */
+el.disabled = false;
+
+/* 🔥 4. SAFE PREFETCH */
+const idle = window.requestIdleCallback || function(fn){ setTimeout(fn, 1); };
+
+if(!window.__PREFETCH_DONE){
+  window.__PREFETCH_DONE = true;
+
+  idle(() => {
+    const keys = Object.keys(GEO || {}).slice(0,2);
+
+    keys.forEach(s=>{
+      if(!STATE_CACHE[s]){
+        fetch(`./geo/${s}.v1.json`)
+          .then(r=>r.json())
+          .then(d=>{
+            STATE_CACHE[s] = d;
+          })
+          .catch(()=>{});
+      }
+    });
+  });
+}
+} // ✅ CLOSE loadDistrict FUNCTION HERE
+
+  
+
+/* 🔥 render function (new) */
+function renderDistrict(stateData){
+
+const el = document.getElementById("district");
 
 let html = `<option value="">Select District</option>`;
 
@@ -216,7 +288,11 @@ for(const key in stateData.districts){
 
 el.innerHTML = html;
 
-el.onchange = () => loadSubdistrict(stateKey, el.value);
+el.onchange = () => loadSubdistrict(
+  document.getElementById("state").value,
+  el.value
+);
+
 }
 
 
@@ -230,10 +306,14 @@ const el = document.getElementById("subdistrict");
 
 if(!districtKey){
   el.innerHTML = `<option>Select Subdistrict</option>`;
+  document.getElementById("village").innerHTML = `<option>Select Village</option>`;
   return;
 }
 
-const subs = GEO[stateKey].districts[districtKey].subdistricts;
+/* 🔥 RESET VILLAGE */
+document.getElementById("village").innerHTML = `<option>Select Village</option>`;
+
+const subs = GEO[stateKey]?.districts?.[districtKey]?.subdistricts || {};
 
 let html = `<option value="">Select Subdistrict</option>`;
 
@@ -261,22 +341,34 @@ if(!subKey){
 }
 
 const villages =
-GEO[stateKey]
-.districts[districtKey]
-.subdistricts[subKey]
-.villages;
+GEO[stateKey]?.districts?.[districtKey]?.subdistricts?.[subKey]?.villages || [];
 
-let html = `<option value="">Select Village</option>`;
+el.innerHTML = `<option value="">Select Village</option>`;
 
-for(const v of villages){
-  html += `<option value="${v.slug}">
-    ${v.name} (${v.pincode})
-  </option>`;
+const CHUNK = 300;
+let i = 0;
+
+function renderChunk(){
+
+  let part = "";
+  let end = Math.min(i + CHUNK, villages.length);
+
+  for(; i < end; i++){
+    const v = villages[i];
+    part += `<option value="${v.slug}">
+      ${v.name} (${v.pincode})
+    </option>`;
+  }
+
+  el.insertAdjacentHTML("beforeend", part);
+
+  if(i < villages.length){
+    requestAnimationFrame(renderChunk);
+  }
 }
 
-el.innerHTML = html;
+renderChunk();
 }
-
 
 
 
@@ -329,11 +421,19 @@ document.getElementById("summary").innerHTML = `
 return;
 }
 
-let days = 0;
-
 const d1 = new Date(from);
 const d2 = new Date(to);
-days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
+
+let days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
+
+if(days <= 0){
+  document.getElementById("summary").innerHTML = `
+  <b>Selected:</b> ${items || "None"}<br>
+  <b>Dates:</b> ${formatDate(from)} → ${formatDate(to)}<br>
+  <b>Days:</b> Invalid
+  `;
+  return;
+}
 
 document.getElementById("summary").innerHTML = `
 <b>Selected:</b> ${items || "None"}<br>
@@ -382,9 +482,20 @@ pincode = v.pincode;
 const from = document.getElementById("fromDate").value;
 const to = document.getElementById("toDate").value;
 
+const items = Object.entries(selected)
+  .filter(([k,v])=>v>0)
+  .map(([k,v])=>`${k} (${v})`)
+  .join(", ");
+
 const d1 = new Date(from);
 const d2 = new Date(to);
-const days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
+
+let days = Math.ceil((d2 - d1)/(1000*60*60*24)) + 1;
+
+if(days <= 0){
+  alert("Invalid date range");
+  return;
+}
 
 if(!name || !phone || !from || !to){
 alert("Please fill all details");
