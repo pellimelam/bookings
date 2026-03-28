@@ -154,32 +154,16 @@ document.getElementById("toDate").addEventListener("change", updateSummary);
 /* =========================
    LOAD JSON DATA
 ========================= */
-
 async function loadGeo(){
 
   if(GEO) return;
 
-  const files = [
-    "./geo_dataset_1.json",
-    "./geo_dataset_2.json",
-    "./geo_dataset_3.json",
-    "./geo_dataset_4.json"
-  ];
+  const res = await fetch("./geo/states.v1.json");
+  GEO = await res.json();
 
-  try {
-
-    const responses = await Promise.all(
-      files.map(f => fetch(f).then(r => r.json()))
-    );
-
-    GEO = Object.assign({}, ...responses);
-
-    console.log("⚡ GEO INSTANT LOADED:", Object.keys(GEO).length);
-
-  } catch(e){
-    console.error("❌ GEO LOAD FAILED", e);
-  }
+  console.log("⚡ STATES LOADED");
 }
+
 
 
 /* =========================
@@ -206,7 +190,7 @@ el.onchange = () => loadDistrict(el.value);
    DISTRICT
 ========================= */
 
-function loadDistrict(stateKey){
+async function loadDistrict(stateKey){
 
 const el = document.getElementById("district");
 
@@ -215,12 +199,19 @@ if(!stateKey){
   return;
 }
 
-const districts = GEO[stateKey].districts;
+/* 🔥 fetch only this state */
+const res = await fetch(`./geo/${stateKey}.v1.json`);
+const stateData = await res.json();
+
+/* store */
+GEO[stateKey] = stateData;
 
 let html = `<option value="">Select District</option>`;
 
-for(const key in districts){
-  html += `<option value="${key}">${districts[key].name}</option>`;
+for(const key in stateData.districts){
+  html += `<option value="${key}">
+    ${stateData.districts[key].name}
+  </option>`;
 }
 
 el.innerHTML = html;
