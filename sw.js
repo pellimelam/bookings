@@ -1,7 +1,7 @@
-const VERSION = "v1.0.1"; // 🔥 change this on every deploy
+const VERSION = "v1.0.2"; // 🔥 change on every deploy
 const CACHE_NAME = "vidhwaan-" + VERSION;
 
-/* CORE ASSETS ONLY (LIGHTWEIGHT) */
+/* CORE ASSETS (KEEP LIGHT) */
 const CORE_ASSETS = [
   "/",
   "/index.html",
@@ -54,8 +54,8 @@ self.addEventListener("fetch", (event) => {
 
   const req = event.request;
 
-  /* 🔥 1. GEO JSON → CACHE FIRST (ULTRA FAST) */
-  if (req.url.includes("geo_dataset")) {
+  /* 🔥 1. GEO FILES (/geo/) → CACHE FIRST */
+  if (req.url.includes("/geo/")) {
     event.respondWith(
       caches.match(req).then(cacheRes => {
         return cacheRes || fetch(req).then(networkRes => {
@@ -70,7 +70,7 @@ self.addEventListener("fetch", (event) => {
   }
 
 
-  /* 🔥 2. STATIC ASSETS → CACHE FIRST */
+  /* 🔥 2. STATIC (JS/CSS/IMG) → CACHE FIRST */
   if (
     req.destination === "style" ||
     req.destination === "script" ||
@@ -90,7 +90,7 @@ self.addEventListener("fetch", (event) => {
   }
 
 
-  /* 🔥 3. HTML → NETWORK FIRST (ALWAYS FRESH) */
+  /* 🔥 3. HTML → NETWORK FIRST (SEO + FRESH) */
   if (req.mode === "navigate") {
     event.respondWith(
       fetch(req)
@@ -105,7 +105,13 @@ self.addEventListener("fetch", (event) => {
   }
 
 
-  /* 🔥 4. DEFAULT FALLBACK */
+  /* 🔥 4. API CALLS (if any) → NETWORK FIRST */
+  if (req.url.includes("http") && req.method === "POST") {
+    return; // don't cache POST
+  }
+
+
+  /* 🔥 5. DEFAULT */
   event.respondWith(
     caches.match(req).then(cacheRes => cacheRes || fetch(req))
   );
