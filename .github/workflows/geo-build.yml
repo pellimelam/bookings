@@ -1,0 +1,26 @@
+name: Build Geo Split (Manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Run Split Script
+        run: node scripts/split-geo.js
+
+      - name: Commit Geo Files
+        run: |
+          git config user.name "geo-bot"
+          git config user.email "bot@vidhwaan.com"
+          git add geo
+          git commit -m "Manual geo split build" || echo "No changes"
+          git push
