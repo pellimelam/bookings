@@ -134,9 +134,14 @@ Download App
 
 document.getElementById("registration").innerHTML = html;
 
+// ✅ ADD THIS LINE HERE
+document.getElementById("state").innerHTML =
+  `<option>Loading states...</option>`;
+
 loadGeo().then(() => {
   initState();
 });
+  
    
 updateSummary();
 
@@ -185,14 +190,15 @@ function initState(){
 
 const el = document.getElementById("state");
 
-el.innerHTML = `<option value="">Select State</option>`;
+let html = `<option value="">Select State</option>`;
 
-Object.keys(GEO).forEach(key=>{
-el.innerHTML += `<option value="${key}">${GEO[key].name}</option>`;
-});
+for(const key in GEO){
+  html += `<option value="${key}">${GEO[key].name}</option>`;
+}
+
+el.innerHTML = html;
 
 el.onchange = () => loadDistrict(el.value);
-
 }
 
 
@@ -203,18 +209,23 @@ el.onchange = () => loadDistrict(el.value);
 function loadDistrict(stateKey){
 
 const el = document.getElementById("district");
-el.innerHTML = `<option value="">Select District</option>`;
 
-if(!stateKey) return;
+if(!stateKey){
+  el.innerHTML = `<option>Select District</option>`;
+  return;
+}
 
 const districts = GEO[stateKey].districts;
 
-Object.keys(districts).forEach(key=>{
-el.innerHTML += `<option value="${key}">${districts[key].name}</option>`;
-});
+let html = `<option value="">Select District</option>`;
+
+for(const key in districts){
+  html += `<option value="${key}">${districts[key].name}</option>`;
+}
+
+el.innerHTML = html;
 
 el.onchange = () => loadSubdistrict(stateKey, el.value);
-
 }
 
 
@@ -225,18 +236,23 @@ el.onchange = () => loadSubdistrict(stateKey, el.value);
 function loadSubdistrict(stateKey, districtKey){
 
 const el = document.getElementById("subdistrict");
-el.innerHTML = `<option value="">Select Subdistrict</option>`;
 
-if(!districtKey) return;
+if(!districtKey){
+  el.innerHTML = `<option>Select Subdistrict</option>`;
+  return;
+}
 
 const subs = GEO[stateKey].districts[districtKey].subdistricts;
 
-Object.keys(subs).forEach(key=>{
-el.innerHTML += `<option value="${key}">${subs[key].name}</option>`;
-});
+let html = `<option value="">Select Subdistrict</option>`;
+
+for(const key in subs){
+  html += `<option value="${key}">${subs[key].name}</option>`;
+}
+
+el.innerHTML = html;
 
 el.onchange = () => loadVillage(stateKey, districtKey, el.value);
-
 }
 
 
@@ -247,9 +263,11 @@ el.onchange = () => loadVillage(stateKey, districtKey, el.value);
 function loadVillage(stateKey, districtKey, subKey){
 
 const el = document.getElementById("village");
-el.innerHTML = `<option value="">Select Village</option>`;
 
-if(!subKey) return;
+if(!subKey){
+  el.innerHTML = `<option>Select Village</option>`;
+  return;
+}
 
 const villages =
 GEO[stateKey]
@@ -257,13 +275,15 @@ GEO[stateKey]
 .subdistricts[subKey]
 .villages;
 
-villages.forEach(v=>{
-el.innerHTML += `
-<option value="${v.slug}">
-${v.name} (${v.pincode})
-</option>`;
-});
+let html = `<option value="">Select Village</option>`;
 
+for(const v of villages){
+  html += `<option value="${v.slug}">
+    ${v.name} (${v.pincode})
+  </option>`;
+}
+
+el.innerHTML = html;
 }
 
 
